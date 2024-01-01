@@ -214,20 +214,22 @@ def setup_session():
         logger.warning("建议使用 --save 保存验证凭据，再次使用则利用 --load 读取，而不需再次登陆")
         logger.info("准备登陆，输入手机号后，按Enter发送验证码")
         phone = input()
+        logger.info("国际字冠码（不要加+）")
+        cid = input()
         try:
-            ret = sess.RenewSMSCaptcha(phone)
+            ret = sess.RenewSMSCaptcha(phone, cid)
         except RecaptchaRequiredException as r:
             logger.warning("准备人工校验，若出错请重启运行")
             recaptcha_url = r.recaptcha_url
             sess.ManuallySolveGeetestRecaptcha(recaptcha_url)
-            ret = sess.RenewSMSCaptcha(phone)
+            ret = sess.RenewSMSCaptcha(phone, cid)
         assert ret['code'] == 0,"发送失败 ：%s" % ret
         logger.debug("验证码已发送")
         for i in range(0, 5):
             logger.info("输入验证码:")
             captcha = input()
             try:
-                sess.LoginViaSMSCaptcha(phone, captcha)
+                sess.LoginViaSMSCaptcha(phone, captcha, cid)
                 sess_upload = sess
                 sess_submit = sess
                 break
