@@ -201,6 +201,13 @@ class BiliSession(Session):
             "https://api.bilibili.com/x/player/v2", params={"cid": cid, "bvid": bvid}
         )
 
+    @WebOnlyAPI
+    def GetTids(self):
+        """获取分区列表"""
+        resp = self.get("https://member.bilibili.com/x/client/archive/pre")
+        res = [child for type_elem in resp.json()["data"]["typelist"] for child in type_elem["children"]]
+        return res
+
     @JSONResponse
     def EditSubmission(self, submission: Submission):
         """编辑作品，适用于重新上传
